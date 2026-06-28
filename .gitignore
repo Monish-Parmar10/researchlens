@@ -1,0 +1,10 @@
+# Prerequisites
+*.log
+node_modules/
+.env
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
