@@ -6,9 +6,9 @@ Welcome to the Research Lens project.
 
 ## Team Members and Ownership
 
-- **Monish**: `frontend/`
-- **Pranjal**: `backend/`
-- **Radhika**: `ai-service/`
+- **M-1**: `frontend/`
+- **M-2**: `backend/`
+- **M-3**: `ai-service/`
 
 ## Project Structure
 
