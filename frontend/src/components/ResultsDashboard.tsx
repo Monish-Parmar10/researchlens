@@ -29,6 +29,7 @@ type Tab = typeof TABS[number];
 
 export default function ResultsDashboard({ paperId }: { paperId: string }) {
   const [activeTab, setActiveTab] = useState<Tab>("Summary");
+  const [expanded, setExpanded] = useState(false);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -98,7 +99,17 @@ export default function ResultsDashboard({ paperId }: { paperId: string }) {
             </div>
             <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Detailed summary</h3>
-              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{mockSummary.detailed}</p>
+              <p className={`text-gray-600 leading-relaxed whitespace-pre-wrap ${!expanded ? 'line-clamp-3' : ''}`}>
+                {mockSummary.detailed}
+              </p>
+              {mockSummary.detailed.length > 200 && (
+                <button 
+                  onClick={() => setExpanded(!expanded)}
+                  className="text-xs text-blue-500 mt-2 hover:underline"
+                >
+                  {expanded ? 'Show less' : 'Show more'}
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -121,8 +132,11 @@ export default function ResultsDashboard({ paperId }: { paperId: string }) {
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
                     <div 
-                      className={`h-full rounded-full transition-all duration-1000 ease-out ${getScoreBgColor(score)}`}
-                      style={{ width: `${score}%` }}
+                      className={`h-full rounded-full ${getScoreBgColor(score)}`}
+                      style={{ 
+                        width: `${score}%`,
+                        transition: 'width 0.6s ease-out'
+                      }}
                     />
                   </div>
                 </div>
