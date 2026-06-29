@@ -16,3 +16,4 @@ Welcome to the Research Lens project.
 - `backend/`: Contains the backend application code.
 - `ai-service/`: Contains the AI service code.
 - `docs/`: Contains documentation including the project architecture.
+2
