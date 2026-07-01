@@ -4,3 +4,5 @@ langchain
 langchain-google-genai
 python-dotenv
 pydantic
+pymupdf
+python-multipart
