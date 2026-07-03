@@ -1,5 +1,4 @@
 import os
-import re
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
@@ -51,21 +50,7 @@ INPUT TEXT:
 
 chain = prompt | structured_llm
 
-def fix_spacing(text: str):
-
-    # Insert space between a lowercase letter and a following capital letter
-    text = re.sub(r'([a-z])([A-Z])', r'\1 \2', text)
-    # Insert space between a letter and a following digit stuck together
-    text = re.sub(r'([a-z])(\d)', r'\1 \2', text)
-    return text
-
-
 # MAIN CHAIN FUNCTION
 async def generate_summary(text: str) -> dict:
     result = await chain.ainvoke({"text": text})
-    return result.model_dump()  # Pydantic v2 
-
-    for key in data:
-        data[key] = fix_spacing(data[key])
-        
-        return data
+    return result.model_dump() 
