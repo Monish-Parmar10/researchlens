@@ -2,11 +2,18 @@ import type { UploadResponse, SummaryResponse } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-// Temporary mock in api.ts
+
 export async function uploadPaper(file: File): Promise<UploadResponse> {
-  // fake loading for 2 seconds
-  await new Promise(r => setTimeout(r, 2000)); 
-  return { paper_id: "mock-123", filename: file.name, page_count: 8 };
+  const formData = new FormData();
+  formData.append('file', file, file.name); //pj's multer field
+
+  const res = await fetch(`${BASE_URL}/api/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error('Upload failed');
+  return res.json();
 }
 
 export async function getSummary(paperId: string): Promise<SummaryResponse> {
