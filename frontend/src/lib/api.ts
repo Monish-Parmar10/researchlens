@@ -1,4 +1,4 @@
-import type { UploadResponse, SummaryResponse } from '@/types';
+import type { UploadResponse, SummaryResponse, ScoreResponse } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
@@ -16,8 +16,22 @@ export async function uploadPaper(file: File): Promise<UploadResponse> {
   return res.json();
 }
 
-export async function getSummary(paperId: string): Promise<SummaryResponse> {
-  const res = await fetch(`${BASE_URL}/api/summary/${paperId}`);
+export async function getSummary(
+  paperId: string
+): Promise<SummaryResponse> {
+  const res = await fetch(
+    `${BASE_URL}/api/summary/${paperId}`
+  );
   if (!res.ok) throw new Error('Failed to fetch summary');
+  return res.json();
+}
+
+export async function getScore(
+  paperId: string
+): Promise<ScoreResponse> {
+  const res = await fetch(
+    `${BASE_URL}/api/score/${paperId}`
+  );
+  if (!res.ok) throw new Error('Failed to fetch score');
   return res.json();
 }

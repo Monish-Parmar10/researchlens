@@ -11,15 +11,18 @@ export interface SummaryResponse {
   detailed: string;
 }
 
+export interface DimensionScore {
+  score: number;
+  reason: string;
+}
+
 export interface ScoreResponse {
-  scores: {
-    problem_statement: number;
-    literature_review: number;
-    methodology: number;
-    experiments: number;
-    results: number;
-    conclusion: number;
-    references: number;
-  };
-  overall: number;
+  problem_statement: DimensionScore;
+  literature_review: DimensionScore;
+  methodology: DimensionScore;
+  experiments: DimensionScore;
+  results: DimensionScore;
+  conclusion: DimensionScore;
+  references: DimensionScore;
+  overall_score: number;
 }

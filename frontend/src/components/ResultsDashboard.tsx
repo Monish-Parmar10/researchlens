@@ -1,15 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, FileText, CheckCircle, MessageSquare, BarChart2 } from "lucide-react";
 import type { SummaryResponse, ScoreResponse } from "@/types";
-
-const mockSummary: SummaryResponse = {
-  one_line: "This paper proposes a novel transformer-based architecture for real-time object detection.",
-  executive: "The authors introduce DetectFormer, a lightweight vision transformer that achieves state-of-the-art performance on the COCO benchmark while running at 45 FPS on edge devices.",
-  detailed: "This paper presents DetectFormer, an end-to-end object detection framework built on a modified Vision Transformer backbone. The proposed method replaces the traditional CNN feature extractor with a hybrid attention mechanism..."
-};
+import { getSummary } from "@/lib/api";
 
 const mockScores: ScoreResponse = {
   scores: {
@@ -30,6 +25,15 @@ type Tab = typeof TABS[number];
 export default function ResultsDashboard({ paperId }: { paperId: string }) {
   const [activeTab, setActiveTab] = useState<Tab>("Summary");
   const [expanded, setExpanded] = useState(false);
+  const [summary, setSummary] = useState<SummaryResponse | null>(null);
+  const [summaryLoading, setSummaryLoading] = useState(true);
+
+  useEffect(() => {
+    getSummary(paperId)
+      .then(setSummary)
+      .catch(console.error)
+      .finally(() => setSummaryLoading(false));
+  }, [paperId]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600";
@@ -55,11 +59,16 @@ export default function ResultsDashboard({ paperId }: { paperId: string }) {
           <ArrowLeft className="w-4 h-4 mr-1.5" />
           Back to Upload
         </Link>
-        <div className="flex items-center space-x-3">
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Research Paper</h1>
-          <span className="px-3 py-1 rounded-md text-sm font-mono font-medium bg-gray-100 text-gray-600 border border-gray-200">
-            ID: {paperId}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Research Paper</h1>
+            <span className="px-3 py-1 rounded-md text-sm font-mono font-medium bg-gray-100 text-gray-600 border border-gray-200">
+              ID: {paperId}
+            </span>
+          </div>
+          <Link href="/" className="inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-blue-700 hover:shadow transition-all focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Upload New Paper
+          </Link>
         </div>
       </div>
 
@@ -88,29 +97,41 @@ export default function ResultsDashboard({ paperId }: { paperId: string }) {
       <div className="min-h-[400px]">
         {activeTab === "Summary" && (
           <div className="space-y-6">
-            <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl shadow-sm relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-              <h3 className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3">One-line summary</h3>
-              <p className="text-xl font-medium text-gray-900 leading-snug">{mockSummary.one_line}</p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Executive summary</h3>
-              <p className="text-gray-700 leading-relaxed text-lg">{mockSummary.executive}</p>
-            </div>
-            <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Detailed summary</h3>
-              <p className={`text-gray-600 leading-relaxed whitespace-pre-wrap ${!expanded ? 'line-clamp-3' : ''}`}>
-                {mockSummary.detailed}
-              </p>
-              {mockSummary.detailed.length > 200 && (
-                <button 
-                  onClick={() => setExpanded(!expanded)}
-                  className="text-xs text-blue-500 mt-2 hover:underline"
-                >
-                  {expanded ? 'Show less' : 'Show more'}
-                </button>
-              )}
-            </div>
+            {summaryLoading ? (
+              <div className="bg-white border border-gray-200 p-12 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center space-y-4">
+                <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                <p className="text-gray-500 font-medium">AI is reading and analyzing your paper...</p>
+                <p className="text-sm text-gray-400">This may take a few moments depending on the document length.</p>
+              </div>
+            ) : !summary ? (
+              <p>Failed to load summary.</p>
+            ) : summary ? (
+              <>
+                <div className="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                  <h3 className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-3">One-line summary</h3>
+                  <p className="text-xl font-medium text-gray-900 leading-snug">{summary.one_line}</p>
+                </div>
+                <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Executive summary</h3>
+                  <p className="text-gray-700 leading-relaxed text-lg">{summary.executive}</p>
+                </div>
+                <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Detailed summary</h3>
+                  <p className={`text-gray-600 leading-relaxed whitespace-pre-wrap ${!expanded ? 'line-clamp-3' : ''}`}>
+                    {summary.detailed}
+                  </p>
+                  {summary.detailed.length > 200 && (
+                    <button 
+                      onClick={() => setExpanded(!expanded)}
+                      className="text-xs text-blue-500 mt-2 hover:underline"
+                    >
+                      {expanded ? 'Show less' : 'Show more'}
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : null}
           </div>
         )}
 
